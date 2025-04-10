@@ -1,5 +1,5 @@
-DROP DATABASE IF EXISTS exhibitions_test;
-DROP DATABASE IF EXISTS exhibitions;
+DROP DATABASE IF EXISTS exhibition_curation_test;
+DROP DATABASE IF EXISTS exhibition_curation;
 
-CREATE DATABASE exhibitions_test;
-CREATE DATABASE exhibitions;
+CREATE DATABASE exhibition_curation_test;
+CREATE DATABASE exhibition_curation;

@@ -1,0 +1,1 @@
+exports.artworkData = require("./artwork")
