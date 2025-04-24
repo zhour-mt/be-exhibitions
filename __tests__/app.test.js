@@ -3,6 +3,7 @@ const request = require("supertest");
 
 const seed = require("../db/seed/seed");
 
+const jwt = require("jsonwebtoken");
 
 const { artworkData, userData } = require("../db/test-db/test-data/index");
 const db = require("../db/connection");
@@ -90,7 +91,7 @@ describe("/api/login", () => {
       .send(postUser)
       .expect(401)
       .then((response) => {
-        expect(response.body.message).toBe('Username not found');
+        expect(response.body.message).toBe("Username not found");
       });
   });
   test("401: user enters invalid password", () => {
@@ -103,8 +104,27 @@ describe("/api/login", () => {
       .send(postUser)
       .expect(401)
       .then((response) => {
-        expect(response.body.message).toBe('Invalid password');
+        expect(response.body.message).toBe("Invalid password");
       });
   });
 });
 
+describe("/api/dashboard", () => {
+  test("200: user logged in and success message if token is valid", () => {
+    const testUser = {
+      id: 1,
+      username: "testuser1",
+    };
+    const token = jwt.sign(testUser, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+    return request(app)
+      .get("/api/dashboard")
+      .set("Authorization", `Bearer ${token}`)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.message).toBe("Welcome back, testuser1");
+      });
+  });
+
+});

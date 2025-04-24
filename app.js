@@ -9,13 +9,15 @@ const app = express();
 const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
+const { verifyToken } = require("./middleware/auth");
 
 const cors = require("cors");
 const { registerUser, handleLogin } = require("./controllers/user-controllers");
 app.use(cors());
 app.use(express.json());
-require("dotenv").config();
-
+require("dotenv").config({
+  path: `${__dirname}/../.env.${process.env.NODE_ENV || "development"}`,
+});
 
 app.get("/api/test", (request, response) => {
   response.json({ message: "Hello from the backend API!" });
@@ -28,6 +30,10 @@ app.get("/api/artworks/:artwork_id", getArtworkById);
 app.post("/api/register", registerUser);
 
 app.post("/api/login", handleLogin);
+
+app.get("/api/dashboard", verifyToken, (req, res) => {
+  res.send({ message: `Welcome back, ${req.user.username}` });
+});
 
 // app.all("/*", (request, response, next) => {
 //   response.status(404).send({ message: "Path not found." });

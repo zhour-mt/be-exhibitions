@@ -1,4 +1,9 @@
 const { makeUser, loginUser } = require("../models/user-models");
+const jwt = require("jsonwebtoken");
+
+require("dotenv").config({
+  path: `${__dirname}/../.env.${process.env.NODE_ENV || "development"}`,
+});
 
 exports.registerUser = (request, response, next) => {
   const { username, email, password } = request.body;
@@ -19,9 +24,12 @@ exports.handleLogin = (request, response, next) => {
 
   loginUser({ username, password })
     .then((user) => {
+      if (!process.env.JWT_SECRET) {
+        throw new Error("JWT_SECRET is not set in environment variables!");
+      }
       const token = jwt.sign(
         { id: user.id, username: user.username },
-        "privatekey",
+        process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
 
