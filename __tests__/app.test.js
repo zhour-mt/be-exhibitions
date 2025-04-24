@@ -80,5 +80,31 @@ describe("/api/login", () => {
         expect(response.body.user.username).toBe(postUser.username);
       });
   });
+  test("401: user enters invalid username", () => {
+    const postUser = {
+      username: "testuserrr",
+      password: "pass123",
+    };
+    return request(app)
+      .post("/api/login")
+      .send(postUser)
+      .expect(401)
+      .then((response) => {
+        expect(response.body.message).toBe('Username not found');
+      });
+  });
+  test("401: user enters invalid password", () => {
+    const postUser = {
+      username: "testuser1",
+      password: "password",
+    };
+    return request(app)
+      .post("/api/login")
+      .send(postUser)
+      .expect(401)
+      .then((response) => {
+        expect(response.body.message).toBe('Invalid password');
+      });
+  });
 });
 

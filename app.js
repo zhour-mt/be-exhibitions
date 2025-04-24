@@ -13,12 +13,13 @@ const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const { registerUser, handleLogin } = require("./controllers/user-controllers");
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
+require("dotenv").config();
+
 
 app.get("/api/test", (request, response) => {
   response.json({ message: "Hello from the backend API!" });
 });
-
 
 app.get("/api/artworks", getArtworks);
 
@@ -26,7 +27,36 @@ app.get("/api/artworks/:artwork_id", getArtworkById);
 
 app.post("/api/register", registerUser);
 
-app.post("/api/login", handleLogin)
+app.post("/api/login", handleLogin);
 
+// app.all("/*", (request, response, next) => {
+//   response.status(404).send({ message: "Path not found." });
+//   next(err);
+// });
+
+app.use((err, request, response, next) => {
+  if (err.code === "23502" || err.code === "22P02" || err.status === 400) {
+    response.status(400).send({ message: "Bad request." });
+  }
+  next(err);
+});
+
+app.use((err, request, response, next) => {
+  if (err.status === 404) {
+    response.status(404).send({ message: err.message });
+  }
+  next(err);
+});
+
+app.use((err, request, response, next) => {
+  if (err.status === 401) {
+    response.status(401).send({ message: err.message });
+  }
+  next(err);
+});
+
+app.use((err, request, response, next) => {
+  response.status(500).send({ message: "Internal Server Error." });
+});
 
 module.exports = app;

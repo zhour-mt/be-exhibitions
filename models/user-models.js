@@ -42,8 +42,8 @@ exports.loginUser = ({ username, password }) => {
           return Promise.reject({ status: 401, message: "Invalid password" });
         }
         const { password_hash, ...safeUser } = user;
+        
         return safeUser;
       });
     });
 };
-
