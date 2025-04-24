@@ -1,10 +1,12 @@
 const format = require("pg-format");
 const db = require("../connection");
+
 const bcrypt = require("bcrypt")
 
 const seed = (artworkData, userData) => {
   return db
     .query(`DROP TABLE IF EXISTS users, artworks CASCADE;`)
+
     .then(() => {
       const artworksTablePromise = db.query(`
             CREATE TABLE artworks (
@@ -17,6 +19,7 @@ const seed = (artworkData, userData) => {
             exhibition_history TEXT
             );`);
 
+
       const usersTablePromise = db.query(`
             CREATE TABLE users (
                 id SERIAL PRIMARY KEY,
@@ -27,6 +30,7 @@ const seed = (artworkData, userData) => {
             );`);
 
       return Promise.all([artworksTablePromise, usersTablePromise]);
+
     })
     .then(() => {
       const insertArtworksQueryStr = format(
@@ -43,6 +47,7 @@ const seed = (artworkData, userData) => {
           art.exhibition_history,
         ])
       );
+
       return db.query(insertArtworksQueryStr);
     })
     .then(() => {
@@ -60,6 +65,8 @@ const seed = (artworkData, userData) => {
         );
         return db.query(insertUsersQuery);
       });
+
+
     });
 };
 
