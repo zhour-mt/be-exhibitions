@@ -1,12 +1,12 @@
 const format = require("pg-format");
 const db = require("../connection");
 
-const seed = (artworkData) => {
+const bcrypt = require("bcrypt")
+
+const seed = (artworkData, userData) => {
   return db
-    .query(`DROP TABLE IF EXISTS comments;`)
-    .then(() => {
-      return db.query(`DROP TABLE IF EXISTS artworks;`);
-    })
+    .query(`DROP TABLE IF EXISTS users, artworks CASCADE;`)
+
     .then(() => {
       const artworksTablePromise = db.query(`
             CREATE TABLE artworks (
@@ -18,7 +18,19 @@ const seed = (artworkData) => {
             colorfulness DECIMAL(5,2),
             exhibition_history TEXT
             );`);
-      return Promise.all([artworksTablePromise]);
+
+
+      const usersTablePromise = db.query(`
+            CREATE TABLE users (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(100) UNIQUE NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );`);
+
+      return Promise.all([artworksTablePromise, usersTablePromise]);
+
     })
     .then(() => {
       const insertArtworksQueryStr = format(
@@ -37,6 +49,24 @@ const seed = (artworkData) => {
       );
 
       return db.query(insertArtworksQueryStr);
+    })
+    .then(() => {
+      const hashedUserPromises = userData.map((user) => {
+        return bcrypt.hash(user.password, 10).then((hashedPassword) => {
+          return [user.username, user.email, hashedPassword];
+        });
+      });
+
+      return Promise.all(hashedUserPromises).then((hashedUsers) => {
+        const insertUsersQuery = format(
+          `INSERT INTO users (username, email, password_hash)
+             VALUES %L RETURNING *;`,
+          hashedUsers
+        );
+        return db.query(insertUsersQuery);
+      });
+
+
     });
 };
 

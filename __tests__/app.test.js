@@ -3,11 +3,12 @@ const request = require("supertest");
 
 const seed = require("../db/seed/seed");
 
-const { artworkData } = require("../db/test-db/test-data/index");
+
+const { artworkData, userData } = require("../db/test-db/test-data/index");
 const db = require("../db/connection");
 
 beforeEach(() => {
-  return seed(artworkData);
+  return seed(artworkData, userData);
 });
 
 afterAll(() => {
@@ -37,13 +38,47 @@ describe("GET /api/artworks", () => {
 });
 
 describe("GET /api/artworks/:artwork_id", () => {
-    test("200: responds with an object including the artwork with the given id", () => {
-      return request(app)
-        .get("/api/artworks/161")
-        .expect(200)
-        .then(({ body }) => {
-          expect(body.artwork.length).toBe(1);
-          expect(body.artwork[0].id).toBe(161);
-        });
-    });
+  test("200: responds with an object including the artwork with the given id", () => {
+    return request(app)
+      .get("/api/artworks/161")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.artwork.length).toBe(1);
+        expect(body.artwork[0].id).toBe(161);
+      });
   });
+});
+
+describe("/api/register", () => {
+  test("201: created user", () => {
+    const postUser = {
+      username: "user1",
+      email: "test@test.com",
+      password: "SecurePass!2024",
+    };
+    return request(app)
+      .post("/api/register")
+      .send(postUser)
+      .expect(201)
+      .then((response) => {
+        expect(response.body.user.username).toBe(postUser.username);
+      });
+  });
+});
+
+describe("/api/login", () => {
+  test("201: user logged in", () => {
+    const postUser = {
+      username: "testuser1",
+      password: "pass123",
+    };
+    return request(app)
+      .post("/api/login")
+      .send(postUser)
+      .expect(200)
+      .then((response) => {
+        expect(response.body.user.username).toBe(postUser.username);
+      });
+  });
+});
+
