@@ -50,7 +50,7 @@ describe("GET /api/artworks/:artwork_id", () => {
   });
 });
 
-describe("/api/register", () => {
+describe("POST /api/register", () => {
   test("201: created user", () => {
     const postUser = {
       username: "user1",
@@ -67,7 +67,7 @@ describe("/api/register", () => {
   });
 });
 
-describe("/api/login", () => {
+describe("POST /api/login", () => {
   test("201: user logged in", () => {
     const postUser = {
       username: "testuser1",
@@ -109,7 +109,7 @@ describe("/api/login", () => {
   });
 });
 
-describe("/api/dashboard", () => {
+describe("GET /api/dashboard", () => {
   test("200: user logged in and success message if token is valid", () => {
     const testUser = {
       id: 1,
@@ -126,5 +126,17 @@ describe("/api/dashboard", () => {
         expect(response.body.message).toBe("Welcome back, testuser1");
       });
   });
-
 });
+
+describe("GET /api/artworks/:id", () => {
+  test("200: responds with an object containing the requested artwork", () => {
+    return request(app)
+      .get("/api/artworks/161")
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+        expect(body.artwork[0].id).toBe(161);
+      });
+  });
+});
+

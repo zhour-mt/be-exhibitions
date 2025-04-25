@@ -6,7 +6,8 @@ const {
   getArtworkById,
 } = require("./controllers/artworks-controllers");
 const app = express();
-const jwt = require("jsonwebtoken");
+
+
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const { verifyToken } = require("./middleware/auth");
