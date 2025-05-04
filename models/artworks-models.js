@@ -16,3 +16,5 @@ exports.selectArtworkById = (id) => {
         return result.rows
     })
 }
+
+

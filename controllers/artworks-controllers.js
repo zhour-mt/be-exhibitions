@@ -1,4 +1,4 @@
-const { selectArtworks, selectArtworkById } = require("../models/artworks-models")
+const { selectArtworks, selectArtworkById, saveArtworkById } = require("../models/artworks-models")
 
 
 exports.getArtworks = (request, response, next) => {
@@ -14,3 +14,4 @@ exports.getArtworkById = (request, response, next) => {
         response.status(200).send({ artwork: result });
     })
 }
+

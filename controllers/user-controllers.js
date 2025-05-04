@@ -1,4 +1,11 @@
-const { makeUser, loginUser } = require("../models/user-models");
+const { request, response } = require("express");
+const {
+  makeUser,
+  loginUser,
+  selectExhibitions,
+  addExhibition,
+  saveArtwork,
+} = require("../models/user-models");
 const jwt = require("jsonwebtoken");
 
 require("dotenv").config({
@@ -10,7 +17,6 @@ exports.registerUser = (request, response, next) => {
 
   makeUser({ username, email, password })
     .then((newUser) => {
-      console.log(newUser);
       response.status(201).send({ user: newUser });
     })
     .catch((err) => {
@@ -27,6 +33,7 @@ exports.handleLogin = (request, response, next) => {
       if (!process.env.JWT_SECRET) {
         throw new Error("JWT_SECRET is not set in environment variables!");
       }
+
       const token = jwt.sign(
         { id: user.id, username: user.username },
         process.env.JWT_SECRET,
@@ -37,5 +44,56 @@ exports.handleLogin = (request, response, next) => {
     })
     .catch((err) => {
       next(err);
+    });
+};
+
+exports.getExhibitions = (request, response, next) => {
+  const { id } = request.user;
+  selectExhibitions(id)
+    .then((result) => {
+      response.status(200).send({ exhibitions: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postExhibition = (request, response, next) => {
+  const { id } = request.user;
+  const { title, description } = request.body;
+  addExhibition(id, title, description)
+    .then((result) => {
+      response.status(201).send({ exhibition: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postArtwork = (request, response, next) => {
+  console.log("hi");
+  const { id } = request.user;
+  const { exhibition_id } = request.params;
+  const { artwork_id, title, artist, image_id } = request.body;
+
+  if (!artwork_id || !title || !image_id) {
+    return Promise.reject({
+      status: 400,
+      message: "Artwork ID, title, and image_id are required",
+    });
+  }
+
+  saveArtwork(exhibition_id, artwork_id, title, artist, image_id)
+    .then((result) => {
+      response.status(201).send({ updatedExhibition: result });
+    })
+    .catch((err) => {
+      if (err.code === "23505") {
+        res
+          .status(409)
+          .json({ message: "Artwork already saved to this exhibition" });
+      } else {
+        next(err);
+      }
     });
 };

@@ -4,6 +4,7 @@ const db = require("./db/connection");
 const {
   getArtworks,
   getArtworkById,
+  likeArtworkById,
 } = require("./controllers/artworks-controllers");
 const app = express();
 
@@ -13,7 +14,7 @@ const bcrypt = require("bcryptjs");
 const { verifyToken } = require("./middleware/auth");
 
 const cors = require("cors");
-const { registerUser, handleLogin } = require("./controllers/user-controllers");
+const { registerUser, handleLogin, getExhibitions, postExhibition, postArtwork } = require("./controllers/user-controllers");
 app.use(cors());
 app.use(express.json());
 require("dotenv").config({
@@ -35,6 +36,12 @@ app.post("/api/login", handleLogin);
 app.get("/api/dashboard", verifyToken, (req, res) => {
   res.send({ message: `Welcome back, ${req.user.username}` });
 });
+
+app.get("/api/user/exhibitions", verifyToken, getExhibitions)
+
+app.post("/api/user/exhibitions", verifyToken, postExhibition)
+
+app.post("/api/user/exhibitions/:exhibition_id/artwork", verifyToken, postArtwork)
 
 // app.all("/*", (request, response, next) => {
 //   response.status(404).send({ message: "Path not found." });

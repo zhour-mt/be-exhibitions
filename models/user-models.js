@@ -42,8 +42,44 @@ exports.loginUser = ({ username, password }) => {
           return Promise.reject({ status: 401, message: "Invalid password" });
         }
         const { password_hash, ...safeUser } = user;
-        
+
         return safeUser;
       });
+    });
+};
+
+exports.selectExhibitions = () => {
+  let exhibitionString = `SELECT * FROM exhibitions`;
+  return db.query(exhibitionString).then((result) => {
+    return result.rows;
+  });
+};
+
+exports.addExhibition = (user_id, title, description) => {
+  return db
+    .query(
+      `INSERT INTO exhibitions (user_id, title, description)
+        VALUES ($1, $2, $3)
+        RETURNING *;
+      `,
+      [user_id, title, description]
+    )
+    .then((result) => result.rows[0]);
+};
+
+exports.saveArtwork = (exhibition_id, artwork_id, title, artist, image_id) => {
+
+  return db
+    .query(
+      `
+    INSERT INTO exhibition_artworks
+      (exhibition_id, artwork_id, title, artist, image_id)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *;
+    `,
+      [exhibition_id, artwork_id, title, artist, image_id]
+    )
+    .then((result) => {
+      return result.rows[0];
     });
 };
