@@ -14,7 +14,7 @@ const bcrypt = require("bcryptjs");
 const { verifyToken } = require("./middleware/auth");
 
 const cors = require("cors");
-const { registerUser, handleLogin, getExhibitions, postExhibition, postArtwork } = require("./controllers/user-controllers");
+const { registerUser, handleLogin, getExhibitions, postExhibition, postArtwork, getExhibitionById } = require("./controllers/user-controllers");
 app.use(cors());
 app.use(express.json());
 require("dotenv").config({
@@ -42,6 +42,8 @@ app.get("/api/user/exhibitions", verifyToken, getExhibitions)
 app.post("/api/user/exhibitions", verifyToken, postExhibition)
 
 app.post("/api/user/exhibitions/:exhibition_id/artwork", verifyToken, postArtwork)
+
+app.get("/api/user/exhibitions/:exhibition_id/artworks", verifyToken, getExhibitionById)
 
 // app.all("/*", (request, response, next) => {
 //   response.status(404).send({ message: "Path not found." });

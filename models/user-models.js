@@ -68,11 +68,9 @@ exports.addExhibition = (user_id, title, description) => {
 };
 
 exports.saveArtwork = (exhibition_id, artwork_id, title, artist, image_id) => {
-
   return db
     .query(
-      `
-    INSERT INTO exhibition_artworks
+      `INSERT INTO exhibition_artworks
       (exhibition_id, artwork_id, title, artist, image_id)
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *;
@@ -82,4 +80,12 @@ exports.saveArtwork = (exhibition_id, artwork_id, title, artist, image_id) => {
     .then((result) => {
       return result.rows[0];
     });
+};
+
+exports.selectExhibitionById = (id) => {
+  let exhibitionString = `SELECT * FROM exhibition_artworks WHERE exhibition_id=${id}`;
+
+  return db.query(exhibitionString).then((result) => {
+    return result.rows;
+  });
 };

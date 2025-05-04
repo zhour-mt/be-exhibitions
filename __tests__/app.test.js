@@ -189,7 +189,7 @@ describe("POST /api/user/exhibitions/:id/artworks", () => {
       artwork_id: 3001,
       title: "Sunset in Blue",
       artist: "Imani Ellis",
-      image_id: "abc123xyz789"
+      image_id: "abc123xyz789",
     };
     return request(app)
       .post("/api/user/exhibitions/1/artwork")
@@ -197,16 +197,17 @@ describe("POST /api/user/exhibitions/:id/artworks", () => {
       .set("Authorization", `Bearer ${userToken}`)
       .expect(201)
       .then(({ body }) => {
-        console.log(body)
         expect(body.updatedExhibition.exhibition_id).toBe(1);
-        expect(body.updatedExhibition.artwork_id).toBe(artworkToSave.artwork_id);
+        expect(body.updatedExhibition.artwork_id).toBe(
+          artworkToSave.artwork_id
+        );
       });
   });
   test("400: Bad request if insufficent details are sent", () => {
     const artworkToSave = {
       artwork_id: 3001,
       artist: "Imani Ellis",
-      image_id: "abc123xyz789"
+      image_id: "abc123xyz789",
     };
     return request(app)
       .post("/api/user/exhibitions/1/artwork")
@@ -219,4 +220,18 @@ describe("POST /api/user/exhibitions/:id/artworks", () => {
   });
 });
 
-
+describe("GET /api/user/exhibitions/:exhibition_id/artworks", () => {
+  test("200: returns artworks saved to a specific exhibition", () => {
+    return request(app)
+      .get("/api/user/exhibitions/1/artworks")
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(200)
+      .then(({ body }) => {
+        console.log(body)
+        expect(body.exhibition[0]).toHaveProperty("artwork_id");
+        expect(body.exhibition[0]).toHaveProperty("title");
+        expect(body.exhibition[0]).toHaveProperty("artist");
+        expect(body.exhibition[0]).toHaveProperty("image_id");
+      });
+  });
+});

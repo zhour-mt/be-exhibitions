@@ -5,6 +5,7 @@ const {
   selectExhibitions,
   addExhibition,
   saveArtwork,
+  selectExhibitionById,
 } = require("../models/user-models");
 const jwt = require("jsonwebtoken");
 
@@ -71,8 +72,6 @@ exports.postExhibition = (request, response, next) => {
 };
 
 exports.postArtwork = (request, response, next) => {
-  console.log("hi");
-  const { id } = request.user;
   const { exhibition_id } = request.params;
   const { artwork_id, title, artist, image_id } = request.body;
 
@@ -96,4 +95,11 @@ exports.postArtwork = (request, response, next) => {
         next(err);
       }
     });
+};
+
+exports.getExhibitionById = (request, response, next) => {
+  const { exhibition_id } = request.params;
+  selectExhibitionById(exhibition_id).then((result) => {
+    response.status(200).send({ exhibition: result });
+  })
 };
