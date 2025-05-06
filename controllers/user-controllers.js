@@ -1,4 +1,3 @@
-const { request, response } = require("express");
 const {
   makeUser,
   loginUser,
@@ -6,6 +5,10 @@ const {
   addExhibition,
   saveArtwork,
   selectExhibitionById,
+  removeExhibitionById,
+  selectSavedArtworks,
+  postSavedArtwork,
+  removeSavedArtwork,
 } = require("../models/user-models");
 const jwt = require("jsonwebtoken");
 
@@ -21,7 +24,6 @@ exports.registerUser = (request, response, next) => {
       response.status(201).send({ user: newUser });
     })
     .catch((err) => {
-      console.log(err);
       next(err);
     });
 };
@@ -38,7 +40,7 @@ exports.handleLogin = (request, response, next) => {
       const token = jwt.sign(
         { id: user.id, username: user.username },
         process.env.JWT_SECRET,
-        { expiresIn: "1h" }
+        { expiresIn: "3h" }
       );
 
       response.status(200).send({ user, token });
@@ -101,5 +103,49 @@ exports.getExhibitionById = (request, response, next) => {
   const { exhibition_id } = request.params;
   selectExhibitionById(exhibition_id).then((result) => {
     response.status(200).send({ exhibition: result });
-  })
+  });
+};
+
+exports.deleteExhibitionById = (request, response, next) => {
+  const { exhibition_id } = request.params;
+  removeExhibitionById(exhibition_id)
+    .then(() => {
+      response.status(204).send({ message: "No content" });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getSavedArtworks = (request, response, next) => {
+  selectSavedArtworks()
+    .then((result) => {
+      response.status(200).send({ savedArtworks: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postSavedArtwork = (request, response, next) => {
+  const { exhibition_id, artwork_id, title, artist, image_id } = request.body;
+
+  saveArtwork(exhibition_id, artwork_id, title, artist, image_id)
+    .then((result) => {
+      response.status(201).send({ updatedExhibition: result });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteSavedArtwork = (request, response, next) => {
+  const { artwork_id } = request.params;
+  removeSavedArtwork(artwork_id)
+    .then((result) => {
+      response.status(204).send({ message: "No content" });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

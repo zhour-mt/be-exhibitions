@@ -89,3 +89,36 @@ exports.selectExhibitionById = (id) => {
     return result.rows;
   });
 };
+
+exports.removeExhibitionById = (id) => {
+  let exhibitionString = `DELETE FROM exhibitions WHERE id = ${id}`;
+
+  return db.query(exhibitionString).then((result) => {
+    return result;
+  });
+};
+
+exports.selectSavedArtworks = () => {
+  let artworksString = `SELECT * FROM exhibition_artworks`;
+
+  return db.query(artworksString).then((result) => {
+    return result.rows;
+  });
+};
+
+exports.removeSavedArtwork = (artwork_id) => {
+  let deleteArtworkQuery = `DELETE FROM exhibition_artworks
+     WHERE artwork_id = $1
+     RETURNING *;`;
+
+
+  return db.query(deleteArtworkQuery, [artwork_id]).then((result) => {
+    if (result.rowCount === 0) {
+      return Promise.reject({
+        status: 404,
+        message: "Artwork not found in saved list",
+      });
+    }
+    return result;
+  });
+};

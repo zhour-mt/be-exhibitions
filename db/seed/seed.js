@@ -35,12 +35,7 @@ const seed = (
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );`);
 
-      
-
-      return Promise.all([
-        artworksTablePromise,
-        usersTablePromise,
-      ]);
+      return Promise.all([artworksTablePromise, usersTablePromise]);
     })
     .then(() => {
       const exhibitionsTablePromise = db.query(`
@@ -57,13 +52,15 @@ const seed = (
     .then(() => {
       const exhibitionArtworksTablePromise = db.query(`
         CREATE TABLE exhibition_artworks (
+        id SERIAL PRIMARY KEY,
         exhibition_id INTEGER REFERENCES exhibitions(id) ON DELETE CASCADE,
         artwork_id INTEGER NOT NULL,
         title VARCHAR(255) NOT NULL,
         artist VARCHAR(255),
         image_id VARCHAR(255),
-        PRIMARY KEY (exhibition_id, artwork_id)
-        )`);
+        guest_session_id UUID DEFAULT NULL, 
+        UNIQUE(artwork_id, exhibition_id, guest_session_id)
+        );`);
 
       return exhibitionArtworksTablePromise;
     })
@@ -122,7 +119,7 @@ const seed = (
           artwork.exhibition_id,
           artwork.artwork_id,
           artwork.title,
-          artwork.artist,
+          artwork.artist_title,
           artwork.image_id,
         ])
       );

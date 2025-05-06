@@ -227,11 +227,121 @@ describe("GET /api/user/exhibitions/:exhibition_id/artworks", () => {
       .set("Authorization", `Bearer ${userToken}`)
       .expect(200)
       .then(({ body }) => {
-        console.log(body)
         expect(body.exhibition[0]).toHaveProperty("artwork_id");
         expect(body.exhibition[0]).toHaveProperty("title");
         expect(body.exhibition[0]).toHaveProperty("artist");
         expect(body.exhibition[0]).toHaveProperty("image_id");
+      });
+  });
+});
+
+describe("DELETE /api/user/exhibitions/:exhibition_id", () => {
+  test("204: deletes exhibition with the given exhibition id", () => {
+    return request(app)
+      .delete("/api/user/exhibitions/2")
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(204)
+      .then((response) => {
+        expect(response.body).toEqual({});
+      });
+  });
+});
+
+describe("GET /api/user/exhibitions/artworks", () => {
+  test("200: returns all saved artworks", () => {
+    return request(app)
+      .get("/api/user/exhibitions/artworks")
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.savedArtworks.length).toBe(5);
+      });
+  });
+});
+
+describe("GET /api/user/exhibitions/artworks", () => {
+  test("200: returns all saved artworks", () => {
+    return request(app)
+      .get("/api/user/exhibitions/artworks")
+      .set("Authorization", `Bearer ${userToken}`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.savedArtworks.length).toBe(5);
+      });
+  });
+});
+
+describe("GET /api/exhibitions/guest-artworks", () => {
+  const guestSessionId = "11111111-1111-1111-1111-111111111111";
+  beforeEach(() => {
+    return db.query(
+      `
+          INSERT INTO exhibition_artworks (artwork_id, title, artist, image_id, guest_session_id)
+          VALUES (9999, 'Guest Test Art', 'Guest Artist', 'image123', $1)
+        `,
+      [guestSessionId]
+    );
+  });
+
+  test("200: gets guest's saved artworks", () => {
+    return request(app)
+      .get("/api/exhibitions/guest-artworks")
+      .query({ guest_session_id: guestSessionId })
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body.savedArtworks)).toBe(true);
+        expect(body.savedArtworks.length).toBe(1);
+        expect(body.savedArtworks[0]).toHaveProperty(
+          "guest_session_id",
+          guestSessionId
+        );
+      });
+  });
+});
+
+describe("POST /api/exhibitions/guest-artworks", () => {
+  const guestSessionId = "11111111-1111-1111-1111-111111111111";
+  const guestArtwork = {
+    artwork_id: 4444,
+    title: "Guest Test Piece",
+    artist: "Guest Artist",
+    image_id: "guest-image-4444",
+    guest_session_id: guestSessionId,
+  };
+  test("201: saves artwork for guest", () => {
+    return request(app)
+      .post("/api/exhibitions/guest-artworks")
+      .send(guestArtwork)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.savedArtwork.artwork_id).toBe(4444);
+        expect(body.savedArtwork).toHaveProperty(
+          "guest_session_id",
+          guestSessionId
+        );
+      });
+  });
+});
+
+describe("DELETE /api/exhibitions/guest-artworks/:artwork_id", () => {
+  const guestSessionId = "11111111-1111-1111-1111-111111111111";
+  beforeEach(() => {
+    return db.query(
+      `
+        INSERT INTO exhibition_artworks (artwork_id, title, artist, image_id, guest_session_id)
+        VALUES (9999, 'Guest Test Art', 'Guest Artist', 'image123', $1)
+      `,
+      [guestSessionId]
+    );
+  });
+
+  test("204: removes guest artwork", () => {
+    return request(app)
+      .delete(`/api/exhibitions/guest-artworks/9999`)
+      .query({ guest_session_id: guestSessionId })
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
       });
   });
 });

@@ -5,6 +5,9 @@ const {
   getArtworks,
   getArtworkById,
   likeArtworkById,
+  getGuestArtworks,
+  postGuestArtwork,
+  deleteGuestArtwork,
 } = require("./controllers/artworks-controllers");
 const app = express();
 
@@ -14,7 +17,7 @@ const bcrypt = require("bcryptjs");
 const { verifyToken } = require("./middleware/auth");
 
 const cors = require("cors");
-const { registerUser, handleLogin, getExhibitions, postExhibition, postArtwork, getExhibitionById } = require("./controllers/user-controllers");
+const { registerUser, handleLogin, getExhibitions, postExhibition, postArtwork, getExhibitionById, deleteExhibitionById, getSavedArtworks, postSavedArtwork, deleteSavedArtwork } = require("./controllers/user-controllers");
 app.use(cors());
 app.use(express.json());
 require("dotenv").config({
@@ -41,7 +44,21 @@ app.get("/api/user/exhibitions", verifyToken, getExhibitions)
 
 app.post("/api/user/exhibitions", verifyToken, postExhibition)
 
+app.get("/api/user/exhibitions/artworks",verifyToken, getSavedArtworks)
+
+app.post("/api/user/exhibitions/artworks", verifyToken, postSavedArtwork)
+
+app.delete("/api/user/exhibitions/artworks/:artwork_id", verifyToken, deleteSavedArtwork);
+
+app.get("/api/exhibitions/guest-artworks", getGuestArtworks);
+
+app.post("/api/exhibitions/guest-artworks", postGuestArtwork);
+
+app.delete("/api/exhibitions/guest-artworks/:artwork_id", deleteGuestArtwork);
+
 app.post("/api/user/exhibitions/:exhibition_id/artwork", verifyToken, postArtwork)
+
+app.delete("/api/user/exhibitions/:exhibition_id", verifyToken, deleteExhibitionById)
 
 app.get("/api/user/exhibitions/:exhibition_id/artworks", verifyToken, getExhibitionById)
 
@@ -72,6 +89,7 @@ app.use((err, request, response, next) => {
 });
 
 app.use((err, request, response, next) => {
+  console.log(err)
   response.status(500).send({ message: "Internal Server Error." });
 });
 

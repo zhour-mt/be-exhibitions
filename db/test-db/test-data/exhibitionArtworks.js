@@ -1,4 +1,5 @@
 module.exports = [
+
     {
       exhibition_id: 1,
       artwork_id: 101,
@@ -13,6 +14,7 @@ module.exports = [
       artist: "Unknown",
       image_id: "x9y8z7w6v5"
     },
+  
     {
       exhibition_id: 2,
       artwork_id: 201,
