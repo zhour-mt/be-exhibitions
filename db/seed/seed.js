@@ -99,6 +99,7 @@ const seed = (
       });
     })
     .then(() => {
+      
       const insertExhibitionsQuery = format(
         `INSERT INTO exhibitions 
           (user_id, title, description)

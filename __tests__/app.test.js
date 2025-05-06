@@ -306,12 +306,12 @@ describe("POST /api/exhibitions/guest-artworks", () => {
     title: "Guest Test Piece",
     artist: "Guest Artist",
     image_id: "guest-image-4444",
-    guest_session_id: guestSessionId,
   };
   test("201: saves artwork for guest", () => {
     return request(app)
       .post("/api/exhibitions/guest-artworks")
       .send(guestArtwork)
+      .query({ guest_session_id: guestSessionId })
       .expect(201)
       .then(({ body }) => {
         expect(body.savedArtwork.artwork_id).toBe(4444);
