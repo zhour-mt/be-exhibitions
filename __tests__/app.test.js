@@ -254,22 +254,11 @@ describe("GET /api/user/exhibitions/artworks", () => {
       .set("Authorization", `Bearer ${userToken}`)
       .expect(200)
       .then(({ body }) => {
-        expect(body.savedArtworks.length).toBe(5);
+        expect(body.savedArtworks.length).toBe(2);
       });
   });
 });
 
-describe("GET /api/user/exhibitions/artworks", () => {
-  test("200: returns all saved artworks", () => {
-    return request(app)
-      .get("/api/user/exhibitions/artworks")
-      .set("Authorization", `Bearer ${userToken}`)
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.savedArtworks.length).toBe(5);
-      });
-  });
-});
 
 describe("GET /api/exhibitions/guest-artworks", () => {
   const guestSessionId = "11111111-1111-1111-1111-111111111111";

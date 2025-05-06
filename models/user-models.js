@@ -67,15 +67,22 @@ exports.addExhibition = (user_id, title, description) => {
     .then((result) => result.rows[0]);
 };
 
-exports.saveArtwork = (exhibition_id, artwork_id, title, artist, image_id) => {
+exports.saveArtwork = (
+  exhibition_id,
+  artwork_id,
+  title,
+  artist,
+  image_id,
+  user_id
+) => {
   return db
     .query(
       `INSERT INTO exhibition_artworks
-      (exhibition_id, artwork_id, title, artist, image_id)
-    VALUES ($1, $2, $3, $4, $5)
+      (exhibition_id, artwork_id, title, artist, image_id, user_id)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *;
     `,
-      [exhibition_id, artwork_id, title, artist, image_id]
+      [exhibition_id, artwork_id, title, artist, image_id, user_id]
     )
     .then((result) => {
       return result.rows[0];
@@ -83,25 +90,25 @@ exports.saveArtwork = (exhibition_id, artwork_id, title, artist, image_id) => {
 };
 
 exports.selectExhibitionById = (id) => {
-  let exhibitionString = `SELECT * FROM exhibition_artworks WHERE exhibition_id=${id}`;
+  let exhibitionString = `SELECT * FROM exhibition_artworks WHERE exhibition_id=$1`;
 
-  return db.query(exhibitionString).then((result) => {
+  return db.query(exhibitionString, [id]).then((result) => {
     return result.rows;
   });
 };
 
 exports.removeExhibitionById = (id) => {
-  let exhibitionString = `DELETE FROM exhibitions WHERE id = ${id}`;
+  let exhibitionString = `DELETE FROM exhibitions WHERE id = $1`;
 
-  return db.query(exhibitionString).then((result) => {
+  return db.query(exhibitionString, [id]).then((result) => {
     return result;
   });
 };
 
-exports.selectSavedArtworks = () => {
-  let artworksString = `SELECT * FROM exhibition_artworks`;
+exports.selectSavedArtworks = (user_id) => {
+  let artworksString = `SELECT * FROM exhibition_artworks WHERE user_id = $1 AND guest_session_id IS NULL`;
 
-  return db.query(artworksString).then((result) => {
+  return db.query(artworksString, [user_id]).then((result) => {
     return result.rows;
   });
 };
@@ -110,7 +117,6 @@ exports.removeSavedArtwork = (artwork_id) => {
   let deleteArtworkQuery = `DELETE FROM exhibition_artworks
      WHERE artwork_id = $1
      RETURNING *;`;
-
 
   return db.query(deleteArtworkQuery, [artwork_id]).then((result) => {
     if (result.rowCount === 0) {

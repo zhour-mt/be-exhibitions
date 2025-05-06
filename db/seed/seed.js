@@ -59,6 +59,7 @@ const seed = (
         artist VARCHAR(255),
         image_id VARCHAR(255),
         guest_session_id UUID DEFAULT NULL, 
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         UNIQUE(artwork_id, exhibition_id, guest_session_id)
         );`);
 
@@ -114,7 +115,7 @@ const seed = (
     })
     .then(() => {
       const insertExhibitionsQuery = format(
-        `INSERT INTO exhibition_artworks (exhibition_id, artwork_id, title, artist, image_id)
+        `INSERT INTO exhibition_artworks (exhibition_id, artwork_id, title, artist, image_id, user_id)
           VALUES %L RETURNING *;`,
         exhibitionArtworksData.map((artwork) => [
           artwork.exhibition_id,
@@ -122,6 +123,7 @@ const seed = (
           artwork.title,
           artwork.artist_title,
           artwork.image_id,
+          artwork.user_id,
         ])
       );
       return db.query(insertExhibitionsQuery);

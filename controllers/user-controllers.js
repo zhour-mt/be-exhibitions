@@ -76,6 +76,7 @@ exports.postExhibition = (request, response, next) => {
 exports.postArtwork = (request, response, next) => {
   const { exhibition_id } = request.params;
   const { artwork_id, title, artist, image_id } = request.body;
+  const user_id = request.user.id
 
   if (!artwork_id || !title || !image_id) {
     return Promise.reject({
@@ -84,7 +85,7 @@ exports.postArtwork = (request, response, next) => {
     });
   }
 
-  saveArtwork(exhibition_id, artwork_id, title, artist, image_id)
+  saveArtwork(exhibition_id, artwork_id, title, artist, image_id, user_id)
     .then((result) => {
       response.status(201).send({ updatedExhibition: result });
     })
@@ -118,7 +119,9 @@ exports.deleteExhibitionById = (request, response, next) => {
 };
 
 exports.getSavedArtworks = (request, response, next) => {
-  selectSavedArtworks()
+  const user_id = request.user.id
+  console.log(request.user)
+  selectSavedArtworks(user_id)
     .then((result) => {
       response.status(200).send({ savedArtworks: result });
     })
@@ -128,9 +131,12 @@ exports.getSavedArtworks = (request, response, next) => {
 };
 
 exports.postSavedArtwork = (request, response, next) => {
-  const { exhibition_id, artwork_id, title, artist, image_id } = request.body;
+  const { exhibition_id, artwork_id, title, artist, image_id} = request.body;
 
-  saveArtwork(exhibition_id, artwork_id, title, artist, image_id)
+  const user_id = request.user.id
+  
+
+  saveArtwork(exhibition_id, artwork_id, title, artist, image_id, user_id)
     .then((result) => {
       response.status(201).send({ updatedExhibition: result });
     })
