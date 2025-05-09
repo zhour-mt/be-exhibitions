@@ -166,6 +166,7 @@ describe("GET /api/user/exhibitions", () => {
   });
 });
 
+
 describe("POST/api/user/exhibitions", () => {
   test("201: created new exhibition", () => {
     const postExhibition = {
