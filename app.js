@@ -62,10 +62,7 @@ app.delete("/api/user/exhibitions/:exhibition_id", verifyToken, deleteExhibition
 
 app.get("/api/user/exhibitions/:exhibition_id/artworks", verifyToken, getExhibitionById)
 
-// app.all("/*", (request, response, next) => {
-//   response.status(404).send({ message: "Path not found." });
-//   next(err);
-// });
+
 
 app.use((err, request, response, next) => {
   if (err.code === "23502" || err.code === "22P02" || err.status === 400) {

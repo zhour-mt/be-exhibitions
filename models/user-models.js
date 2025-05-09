@@ -48,9 +48,9 @@ exports.loginUser = ({ username, password }) => {
     });
 };
 
-exports.selectExhibitions = () => {
-  let exhibitionString = `SELECT * FROM exhibitions`;
-  return db.query(exhibitionString).then((result) => {
+exports.selectExhibitions = (user_id) => {
+  let exhibitionString = `SELECT * FROM exhibitions WHERE user_id=$1`;
+  return db.query(exhibitionString, [user_id]).then((result) => {
     return result.rows;
   });
 };
