@@ -14,6 +14,14 @@ module.exports = [
       description: "A collection highlighting geometry and structure in built environments.",
       created_at: "2025-01-22T08:45:00Z",
       updated_at: "2025-01-22T08:45:00Z"
-    }
+    },
+    {
+        id: 3,
+        user_id: 2,
+        title: "Trees",
+        description: "A collection of trees.",
+        created_at: "2025-01-22T08:45:00Z",
+        updated_at: "2025-01-22T08:45:00Z"
+      }
   ];
   
